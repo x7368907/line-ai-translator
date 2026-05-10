@@ -16,6 +16,7 @@ from linebot.v3.messaging import (
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
 
 import os
+import re
 
 load_dotenv()
 
@@ -44,6 +45,14 @@ async def webhook(request: Request):
     handler.handle(body.decode("utf-8"), signature)
 
     return "OK"
+
+
+# 判斷是否為日文
+def is_japanese(text):
+
+    japanese_pattern = re.compile(r"[\u3040-\u30ff]")
+
+    return bool(japanese_pattern.search(text))
 
 
 @handler.add(MessageEvent)
@@ -196,10 +205,15 @@ def handle_message(event):
 
     elif mode == "analyze":
 
-        prompt = f"""
-你是一個 LINE 聊天語氣分析助手。
+        if is_japanese(content):
+            target_language = "繁體中文"
+        else:
+            target_language = "自然日文"
 
-請先翻譯，再分析語氣。
+        prompt = f"""
+請先翻譯成{target_language}。
+
+再簡短分析聊天語氣。
 
 輸出格式：
 
@@ -220,18 +234,33 @@ def handle_message(event):
 
     else:
 
-        prompt = f"""
-中日雙向翻譯。
-中文→自然日文；日文→自然繁中。
-像 LINE 聊天口語，保留語氣與 emoji。
-只輸出翻譯。
+        # 翻譯模式
+        if is_japanese(content):
+            target_language = "繁體中文"
+        else:
+            target_language = "自然日文"
 
-內容：{content}
+        prompt = f"""
+請翻譯成{target_language}。
+
+規則：
+- 使用自然 LINE 聊天口語
+- 保留原本語氣
+- 不要過度正式
+- 不要潤飾原文
+- 不要增加語意
+- 保留 emoji 與顏文字感覺
+- 只輸出翻譯結果
+
+內容：
+{content}
 """
 
-    response = client.responses.create(model="gpt-4.1-nano", input=prompt)
+    response = client.chat.completions.create(
+        model="gpt-4.1-nano", messages=[{"role": "user", "content": prompt}]
+    )
 
-    result = response.output_text
+    result = response.choices[0].message.content
 
     with ApiClient(configuration) as api_client:
 
