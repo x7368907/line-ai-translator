@@ -239,7 +239,7 @@ def handle_message(event):
 {content}
 """
 
-    response = client.responses.create(model="gpt-5-mini", input=prompt)
+    response = client.responses.create(model="gpt-4.1-nano", input=prompt)
 
     result = response.output_text
 
