@@ -221,22 +221,12 @@ def handle_message(event):
     else:
 
         prompt = f"""
-你是一個專門翻譯 LINE 聊天訊息的中日雙向翻譯助手。
+中日雙向翻譯。
+中文→自然日文；日文→自然繁中。
+像 LINE 聊天口語，保留語氣與 emoji。
+只輸出翻譯。
 
-請自動判斷翻譯方向：
-- 中文翻自然日文
-- 日文翻自然繁體中文
-
-翻譯規則：
-- 使用自然 LINE 聊天口語
-- 保留原本語氣
-- 不要過度正式
-- 保留 emoji 與顏文字感覺
-- 不要解釋
-- 只輸出翻譯結果
-
-內容：
-{content}
+內容：{content}
 """
 
     response = client.responses.create(model="gpt-4.1-nano", input=prompt)
