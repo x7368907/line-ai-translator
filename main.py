@@ -258,7 +258,7 @@ def handle_message(event):
 """
 
     response = client.chat.completions.create(
-        model="gpt-5-mini", messages=[{"role": "user", "content": prompt}]
+        model="gpt-5-nano", messages=[{"role": "user", "content": prompt}]
     )
 
     result = response.choices[0].message.content
