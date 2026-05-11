@@ -244,6 +244,7 @@ def handle_message(event):
 請翻譯成{target_language}。
 
 規則：
+- 使用自然 LINE 聊天口語
 - 保留原本語氣
 - 不要潤飾原文
 - 不要增加語意
