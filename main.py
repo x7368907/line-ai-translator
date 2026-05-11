@@ -249,7 +249,8 @@ def handle_message(event):
 - 不要過度正式
 - 不要潤飾原文
 - 不要增加語意
-- 保留 emoji 與顏文字感覺
+- 如果原文有 emoji 或顏文字則保留
+- 如果原文沒有，不要自行新增 emoji
 - 只輸出翻譯結果
 
 內容：
@@ -257,7 +258,7 @@ def handle_message(event):
 """
 
     response = client.chat.completions.create(
-        model="gpt-4.1-nano", messages=[{"role": "user", "content": prompt}]
+        model="gpt-5-mini", messages=[{"role": "user", "content": prompt}]
     )
 
     result = response.choices[0].message.content
