@@ -55,13 +55,21 @@ def is_japanese(text):
     return bool(japanese_pattern.search(text))
 
 
+# 判斷是否為英文
+def is_english(text):
+
+    english_pattern = re.compile(r"^[A-Za-z0-9\s\.,!?\'\"\~\-\(\)\[\]\:\/]+$")
+
+    return bool(english_pattern.match(text))
+
+
 @handler.add(MessageEvent)
 def handle_message(event):
 
     if not isinstance(event.message, TextMessageContent):
         return
 
-    user_text = event.message.text
+    user_text = event.message.text.strip()
 
     # 預設模式
     mode = "translate"
@@ -140,7 +148,10 @@ def handle_message(event):
 
         return
 
+    # =========================
     # Prompt
+    # =========================
+
     if mode == "cute":
 
         prompt = f"""
@@ -150,6 +161,8 @@ def handle_message(event):
 - 簡短自然
 - 像真人聊天
 - 不要解釋
+- 不要自己加 emoji
+- 如果原文有 emoji 才保留
 - 只輸出回覆內容
 
 內容：
@@ -165,6 +178,8 @@ def handle_message(event):
 - 自然聊天感
 - 不要太正式
 - 不要解釋
+- 不要自己加 emoji
+- 如果原文有 emoji 才保留
 - 只輸出回覆內容
 
 內容：
@@ -181,6 +196,8 @@ def handle_message(event):
 - 有一點心動感
 - 不要太油
 - 不要解釋
+- 不要自己加 emoji
+- 如果原文有 emoji 才保留
 - 只輸出回覆內容
 
 內容：
@@ -197,6 +214,8 @@ def handle_message(event):
 - 酷一點
 - 不要太熱情
 - 不要解釋
+- 不要自己加 emoji
+- 如果原文有 emoji 才保留
 - 只輸出回覆內容
 
 內容：
@@ -206,7 +225,11 @@ def handle_message(event):
     elif mode == "analyze":
 
         if is_japanese(content):
-            target_language = "繁體中文"
+            target_language = "English"
+
+        elif is_english(content):
+            target_language = "自然日文"
+
         else:
             target_language = "自然日文"
 
@@ -227,6 +250,7 @@ def handle_message(event):
 - 分析簡短即可
 - 不要過度腦補
 - 只根據這句話判斷
+- 不要自己新增 emoji
 
 內容：
 {content}
@@ -236,7 +260,11 @@ def handle_message(event):
 
         # 翻譯模式
         if is_japanese(content):
-            target_language = "繁體中文"
+            target_language = "English"
+
+        elif is_english(content):
+            target_language = "自然日文"
+
         else:
             target_language = "自然日文"
 
@@ -244,6 +272,7 @@ def handle_message(event):
 請翻譯成{target_language}。
 
 規則：
+- 使用自然 LINE 聊天口語
 - 保留原本語氣
 - 不要過度正式
 - 不要潤飾原文
